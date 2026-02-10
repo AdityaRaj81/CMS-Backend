@@ -46,6 +46,7 @@ public class CaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private CaseStatus status = CaseStatus.ACTIVE;
 
     @ManyToOne(fetch = FetchType.LAZY)

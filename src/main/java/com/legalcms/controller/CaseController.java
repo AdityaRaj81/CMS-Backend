@@ -25,12 +25,27 @@ public class CaseController {
 
     private final CaseService caseService;
 
-    @PostMapping("/create")
+    @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADVOCATE')")
     @Operation(summary = "Create new case", description = "Create a new legal case with manual entry")
     public ResponseEntity<CaseResponse> createCase(@Valid @RequestBody CaseRequest request) {
         CaseResponse response = caseService.createCase(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/create")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADVOCATE')")
+    @Operation(summary = "Create new case", description = "Create a new legal case with manual entry (deprecated, use POST /api/cases)")
+    public ResponseEntity<CaseResponse> createCaseDeprecated(@Valid @RequestBody CaseRequest request) {
+        CaseResponse response = caseService.createCase(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping
+    @Operation(summary = "Get all cases", description = "Returns all legal cases with pagination")
+    public ResponseEntity<List<CaseResponse>> getAllCases() {
+        List<CaseResponse> cases = caseService.getAllCases();
+        return ResponseEntity.ok(cases);
     }
 
     @GetMapping("/my")
@@ -49,13 +64,28 @@ public class CaseController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/{caseId}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADVOCATE')")
+    @Operation(summary = "Update case", description = "Update an existing legal case")
+    public ResponseEntity<CaseResponse> updateCase(@PathVariable Long caseId, @Valid @RequestBody CaseRequest request) {
+        CaseResponse response = caseService.updateCase(caseId, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{caseId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Delete case", description = "Delete a legal case")
+    public ResponseEntity<Void> deleteCase(@PathVariable Long caseId) {
+        caseService.deleteCase(caseId);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/search")
     @Operation(summary = "Search cases", description = "Search cases by case number, CNR number, or party name")
     public ResponseEntity<List<CaseResponse>> searchCases(
             @RequestParam(required = false) String caseNumber,
             @RequestParam(required = false) String cnrNumber,
-            @RequestParam(required = false) String partyName
-    ) {
+            @RequestParam(required = false) String partyName) {
         List<CaseResponse> cases = caseService.searchCases(caseNumber, cnrNumber, partyName);
         return ResponseEntity.ok(cases);
     }

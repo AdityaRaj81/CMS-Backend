@@ -36,7 +36,18 @@ public class User {
     private UserRole role;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean isActive = true;
+
+    private String phone;
+
+    private String barNumber;
+
+    private String firmName;
+
+    private String specialization;
+
+    private String experience;
 
     @CreationTimestamp
     @Column(updatable = false)

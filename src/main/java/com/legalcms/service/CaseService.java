@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,6 +72,15 @@ public class CaseService {
     }
 
     @Transactional(readOnly = true)
+    public List<CaseResponse> getAllCases() {
+        log.info("Fetching all cases");
+        List<CaseEntity> cases = caseRepository.findAll();
+        return cases.stream()
+                .map(this::mapToCaseResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public List<CaseResponse> getMyCases(String email) {
         log.info("Fetching cases for advocate: {}", email);
         User advocate = userRepository.findByEmail(email)
@@ -94,7 +102,7 @@ public class CaseService {
 
     @Transactional(readOnly = true)
     public List<CaseResponse> searchCases(String caseNumber, String cnrNumber, String partyName) {
-        log.info("Searching cases with params - caseNumber: {}, cnrNumber: {}, partyName: {}", 
+        log.info("Searching cases with params - caseNumber: {}, cnrNumber: {}, partyName: {}",
                 caseNumber, cnrNumber, partyName);
 
         List<CaseEntity> cases;
@@ -116,11 +124,41 @@ public class CaseService {
     }
 
     @Transactional
+    public CaseResponse updateCase(Long caseId, CaseRequest request) {
+        log.info("Updating case ID: {}", caseId);
+        CaseEntity caseEntity = caseRepository.findById(caseId)
+                .orElseThrow(() -> new RuntimeException("Case not found"));
+
+        caseEntity.setCaseTitle(request.getCaseTitle());
+        caseEntity.setCaseType(request.getCaseType());
+        caseEntity.setCaseNumber(request.getCaseNumber());
+        caseEntity.setCnrNumber(request.getCnrNumber());
+        caseEntity.setCourtName(request.getCourtName());
+        caseEntity.setNextHearingDate(request.getNextHearingDate());
+        caseEntity.setCaseStage(request.getCaseStage());
+        caseEntity.setStatus(request.getStatus());
+
+        caseEntity = caseRepository.save(caseEntity);
+        log.info("Case updated successfully with ID: {}", caseId);
+        return mapToCaseResponse(caseEntity);
+    }
+
+    @Transactional
+    public void deleteCase(Long caseId) {
+        log.info("Deleting case ID: {}", caseId);
+        if (!caseRepository.existsById(caseId)) {
+            throw new RuntimeException("Case not found");
+        }
+        caseRepository.deleteById(caseId);
+        log.info("Case deleted successfully with ID: {}", caseId);
+    }
+
+    @Transactional
     public void updateCaseDetails(Long caseId, String caseStage, java.time.LocalDate nextHearingDate) {
         log.info("Updating case ID: {} with stage: {} and hearing date: {}", caseId, caseStage, nextHearingDate);
         CaseEntity caseEntity = caseRepository.findById(caseId)
                 .orElseThrow(() -> new RuntimeException("Case not found"));
-        
+
         caseEntity.setCaseStage(caseStage);
         caseEntity.setNextHearingDate(nextHearingDate);
         caseRepository.save(caseEntity);

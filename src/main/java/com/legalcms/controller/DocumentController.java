@@ -39,11 +39,17 @@ public class DocumentController {
             @RequestParam("file") MultipartFile file,
             @RequestParam("caseId") Long caseId,
             @RequestParam("documentType") DocumentType documentType,
-            Authentication authentication
-    ) {
+            Authentication authentication) {
         String email = authentication.getName();
         DocumentResponse response = documentService.uploadDocument(caseId, file, documentType, email);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    @Operation(summary = "Get all documents", description = "Returns all documents in the system")
+    public ResponseEntity<List<DocumentResponse>> getAllDocuments() {
+        List<DocumentResponse> documents = documentService.getAllDocuments();
+        return ResponseEntity.ok(documents);
     }
 
     @GetMapping("/case/{caseId}")
@@ -64,7 +70,7 @@ public class DocumentController {
             if (resource.exists() && resource.isReadable()) {
                 return ResponseEntity.ok()
                         .contentType(MediaType.APPLICATION_PDF)
-                        .header(HttpHeaders.CONTENT_DISPOSITION, 
+                        .header(HttpHeaders.CONTENT_DISPOSITION,
                                 "inline; filename=\"" + document.getFileName() + "\"")
                         .body(resource);
             } else {

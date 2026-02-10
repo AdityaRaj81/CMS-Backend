@@ -1,30 +1,19 @@
 package com.legalcms.dto;
 
-import com.legalcms.model.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserResponse {
-
-    private Long id;
+public class UpdateUserRequest {
     private String fullName;
-    private String email;
-    private UserRole role;
-    private Boolean isActive;
-
     private String phone;
     private String barNumber;
     private String firmName;
     private String specialization;
     private String experience;
-
-    private LocalDateTime createdAt;
 }

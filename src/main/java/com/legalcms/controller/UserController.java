@@ -45,4 +45,13 @@ public class UserController {
         UserResponse response = userService.getUserById(userId);
         return ResponseEntity.ok(response);
     }
+
+    @PutMapping("/me")
+    @Operation(summary = "Update user profile", description = "Update current user's profile information")
+    public ResponseEntity<UserResponse> updateProfile(Authentication authentication,
+            @RequestBody com.legalcms.dto.UpdateUserRequest request) {
+        String email = authentication.getName();
+        UserResponse response = userService.updateUserProfile(email, request);
+        return ResponseEntity.ok(response);
+    }
 }

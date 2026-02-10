@@ -27,24 +27,22 @@ public interface CaseRepository extends JpaRepository<CaseEntity, Long> {
 
     @Query("SELECT c FROM CaseEntity c WHERE c.nextHearingDate BETWEEN :startDate AND :endDate")
     List<CaseEntity> findCasesWithHearingsBetween(
-        @LocalDate startDate, 
-        @LocalDate endDate
-    );
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
 
     @Query("SELECT c FROM CaseEntity c JOIN c.parties p WHERE " +
-           "LOWER(p.petitionerName) LIKE LOWER(CONCAT('%', :partyName, '%')) OR " +
-           "LOWER(p.respondentName) LIKE LOWER(CONCAT('%', :partyName, '%'))")
+            "LOWER(p.petitionerName) LIKE LOWER(CONCAT('%', :partyName, '%')) OR " +
+            "LOWER(p.respondentName) LIKE LOWER(CONCAT('%', :partyName, '%'))")
     List<CaseEntity> findByPartyName(@Param("partyName") String partyName);
 
     @Query("SELECT c FROM CaseEntity c WHERE " +
-           "(:caseNumber IS NULL OR c.caseNumber = :caseNumber) AND " +
-           "(:cnrNumber IS NULL OR c.cnrNumber = :cnrNumber) AND " +
-           "(:courtName IS NULL OR LOWER(c.courtName) LIKE LOWER(CONCAT('%', :courtName, '%')))")
+            "(:caseNumber IS NULL OR c.caseNumber = :caseNumber) AND " +
+            "(:cnrNumber IS NULL OR c.cnrNumber = :cnrNumber) AND " +
+            "(:courtName IS NULL OR LOWER(c.courtName) LIKE LOWER(CONCAT('%', :courtName, '%')))")
     List<CaseEntity> searchCases(
-        @Param("caseNumber") String caseNumber,
-        @Param("cnrNumber") String cnrNumber,
-        @Param("courtName") String courtName
-    );
+            @Param("caseNumber") String caseNumber,
+            @Param("cnrNumber") String cnrNumber,
+            @Param("courtName") String courtName);
 
     List<CaseEntity> findByStatusAndCnrNumberIsNotNull(CaseStatus status);
 }
